@@ -13,6 +13,7 @@ local SmallBomb = require "SmallBomb"
 local Lamp = require "Lamp"
 local Vector = require "Vector"
 local Jumper = require "Jumper"
+local Static = require "Static"
 
 
 updateList = {}
@@ -21,8 +22,12 @@ onNextReset = {}
 onReset = {}
   
 local function insertEntity(entity)
-  table.insert(updateList, entity)
-  table.insert(drawableList, entity)  
+  if entity.update then
+    table.insert(updateList, entity)
+  end
+  if entity.draw then
+    table.insert(drawableList, entity) 
+  end
 end
 
 local function alwaysOnReset(f)
@@ -237,6 +242,35 @@ function resetGame()
   end
 end
 
+function spawnStatics()
+  local imageFileList={
+    "p/bird_dead_l.png",
+    "p/bird_dead_r.png",
+    "p/flash_l.png",
+    "p/flash_r.png",
+    "p/flash_u.png",
+    "p/paper_l.png",
+    "p/paper_r.png",
+    "p/plant.png",
+    "p/stein1.png",
+    "p/stein2.png",
+    "p/stein3.png"
+  }
+  local imageList={}
+  for i=1,#imageFileList do
+    table.insert(imageList, love.graphics.newImage(imageFileList[i]))
+  end
+  
+  local objectCount = 140
+  local objectRange = 1900
+  for i=1,objectCount do
+    local x=love.math.random(-objectRange, objectRange)
+    local y=love.math.random(-objectRange, objectRange)
+    
+    insertEntity(Static:new(x, y, imageList[love.math.random(1, #imageList)]))
+  end
+end
+
 function love.resize(w, h)
   cameraList[1]:resize(0, 0, w/2, h)
   cameraList[2]:resize(w/2, 0, w/2, h)
@@ -271,6 +305,7 @@ function love.load(arg)
   backgroundMusic = love.audio.newSource("s/Main_ looperman-l-1327367-0079222-roadwarrior-its-not-the-same-without-you-sad-piano.wav")
 
   --spawnChicken()
+  spawnStatics()
   
   resetGame()
   setupBombPuzzle()
@@ -282,6 +317,10 @@ end
 function checkEnd(player)
   local maxDistance=120
   local squareDistance=Vector.squareDistance(player.position, jumper.position)
+  
+  if puzzlesSolved < 4 then
+    return
+  end
   
   if squareDistance > maxDistance*maxDistance then
     return
