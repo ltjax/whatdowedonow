@@ -16,6 +16,7 @@ local Jumper = require "Jumper"
 local Static = require "Static"
 
 
+local inIntro=true
 updateList = {}
 drawableList = {}
 onNextReset = {}
@@ -288,6 +289,15 @@ function love.load(arg)
   local height = love.graphics.getHeight()
   love.resize(width, height)
   
+  introImageList = {
+    love.graphics.newImage("p/intro_1.png"),
+    love.graphics.newImage("p/intro_2.png"),
+    love.graphics.newImage("p/intro_3.png"),
+    love.graphics.newImage("p/intro_4.png")
+  }
+  
+  introTimer = 0.0
+  introFrame = 1
   
   local joystickList = love.joystick.getJoysticks()
   
@@ -338,33 +348,52 @@ function checkEnd(player)
 end
 
 function love.update(dt)
-  for j=1,#updateList do
-    updateList[j]:update(dt)
+  if inIntro then
+    introTimer = introTimer + dt
+    if introTimer > 0.05 then
+      introTimer = 0
+      introFrame = introFrame + 1
+      if introFrame > #introImageList then
+        introFrame = 1
+      end
+    end
+  else
+    for j=1,#updateList do
+      updateList[j]:update(dt)
+    end
+    
+    -- check for game end
+    for i=1,#playerList do
+      checkEnd(playerList[i])
+    end
   end
-  
-  -- check for game end
-  for i=1,#playerList do
-    checkEnd(playerList[i])
-  end
+end
+
+function love.keypressed( key, isrepeat )
+  inIntro = false
 end
 
 function love.draw()
   
-  table.sort(drawableList, function(a, b)
-      local layerA = a.drawLayer or 1
-      local layerB = b.drawLayer or 1
-      return layerA < layerB
-  end)
-  
-  for i=1,#cameraList do
-    cameraList[i]:setScissor()
-    love.graphics.setColor(64, 64, 64)
+  if inIntro then
+    love.graphics.draw(introImageList[introFrame], 0, 0)    
+  else
+    table.sort(drawableList, function(a, b)
+        local layerA = a.drawLayer or 1
+        local layerB = b.drawLayer or 1
+        return layerA < layerB
+    end)
     
-    cameraList[i]:draw(backgroundTexture, -2048, -2048)
-    for j=1,#drawableList do
-      drawableList[j]:draw(cameraList[i])
+    for i=1,#cameraList do
+      cameraList[i]:setScissor()
+      love.graphics.setColor(64, 64, 64)
+      
+      cameraList[i]:draw(backgroundTexture, -2048, -2048)
+      for j=1,#drawableList do
+        drawableList[j]:draw(cameraList[i])
+      end
     end
+    love.graphics.setScissor()
   end
-  love.graphics.setScissor()
 end
 
