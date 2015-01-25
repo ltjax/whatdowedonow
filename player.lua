@@ -77,7 +77,7 @@ function Player:update(deltaTime)
 
   if self.hugging then
     self.hugAnimation:update(deltaTime)
-    if self.hugAnimation.finished() and self.huggingFinished then
+    if self.hugAnimation:finished() and self.huggingFinished then
       self.huggingFinished()
       self.huggingFinished = nil
     end  

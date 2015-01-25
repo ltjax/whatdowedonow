@@ -17,6 +17,10 @@ local Static = require "Static"
 
 
 local inIntro=true
+local inEnd=false
+local endFade=0.0
+local creditsTimeout=10.0
+
 updateList = {}
 drawableList = {}
 onNextReset = {}
@@ -296,6 +300,10 @@ function love.load(arg)
     love.graphics.newImage("p/intro_4.png")
   }
   
+  notTheEndImage = love.graphics.newImage("p/not_end.png")
+  creditsImage = love.graphics.newImage("p/credits.png")
+  theEndImage = love.graphics.newImage("p/end.png")
+  
   introTimer = 0.0
   introFrame = 1
   
@@ -324,15 +332,13 @@ function love.load(arg)
   setupTwoButtonFurtherPuzzle()
 end
 
-local endBlend = -1
-
 function checkEnd(player)
   local maxDistance=120
   local squareDistance=Vector.squareDistance(player.position, jumper.position)
   
-  if puzzlesSolved < 4 then
-    return
-  end
+  --if puzzlesSolved < 4 then
+  --  return
+  --end
   
   if squareDistance > maxDistance*maxDistance then
     return
@@ -343,7 +349,7 @@ function checkEnd(player)
     jumper.hide=true
     player:hug()
     bomb.disabled=true
-    player.huggingFinished = function() end
+    player.huggingFinished = function() inEnd=true end
   end
 end
 
@@ -357,6 +363,12 @@ function love.update(dt)
         introFrame = 1
       end
     end
+  elseif inEnd then
+    if endFade < 1.0 then
+      endFade = math.min(endFade + dt, 1.0)
+    else      
+      creditsTimeout = creditsTimeout - dt
+    end    
   else
     for j=1,#updateList do
       updateList[j]:update(dt)
@@ -394,6 +406,15 @@ function love.draw()
       end
     end
     love.graphics.setScissor()
+    
+    if inEnd then
+      love.graphics.setColor(255, 255, 255, 255*endFade)
+      if creditsTimeout < 0.0 then        
+        love.graphics.draw(creditsImage, 0, 0)
+      else
+        love.graphics.draw(notTheEndImage, 0, 0)
+      end
+    end
   end
 end
 
