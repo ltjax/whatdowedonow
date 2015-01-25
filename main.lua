@@ -11,6 +11,7 @@ local Door = require "Door"
 local Animal = require "Animal"
 local SmallBomb = require "SmallBomb"
 local Vector = require "Vector"
+local Jumper = require "Jumper"
 
 updateList = {}
 drawableList = {}
@@ -49,6 +50,11 @@ function setupGame()
   -- Add the bomb
   local bomb=Bomb:new()
   insertEntity(bomb)
+  
+  -- Add the suicidal person
+  local jumper=Jumper:new(love.math.random(-300, 300), 2000)
+  insertEntity(jumper)
+  alwaysOnReset(function() jumper:reset() end)
   
   puzzlesSolved = 0
 
@@ -94,8 +100,9 @@ function setupTwoButtonPuzzle()
       button2.locked=true
       table.insert(onNextReset, function()
         addGlowWorms()
-        puzzlesSolved = puzzlesSolved + 1
-      end)  
+      end) 
+        
+      puzzlesSolved = puzzlesSolved + 1
     end
   end
   
@@ -122,7 +129,9 @@ function setupLongDistancePuzzle()
   end)
   
   door.stateChanged = function()
-    spawnDog()
+    table.insert(onNextReset, function()
+      spawnDog()
+    end)
     puzzlesSolved = puzzlesSolved + 1
   end
 end

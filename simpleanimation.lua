@@ -27,6 +27,7 @@ function SimpleAnimation:start()
   self.stopped=false
 end
 
+
 function SimpleAnimation:finished()
   return self.currentFrame == #self.frameList
 end
