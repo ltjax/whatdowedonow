@@ -32,8 +32,8 @@ end
 function setupGame()
   -- Create players here
   playerList = {
-    Player:new("p/typin_p.png", "p/typin_dead.png"),
-    Player:new("p/typ_blond.png", "p/typ_blond_dead.png")
+    Player:new("p/typin_p.png", "p/typin_dead.png", "p/hug_f.png", 64),
+    Player:new("p/typ_blond.png", "p/typ_blond_dead.png", "p/hug_m.png", 64)
   }
 
   cameraList = {
@@ -50,7 +50,7 @@ function setupGame()
   end
 
   -- Add the bomb
-  local bomb=Bomb:new()
+  bomb=Bomb:new()
   insertEntity(bomb)
 
   -- Add Lamps
@@ -65,7 +65,7 @@ function setupGame()
   end
   
   -- Add the suicidal person
-  local jumper=Jumper:new(love.math.random(-300, 300), 2000)
+  jumper=Jumper:new(love.math.random(-300, 300), 2000)
   insertEntity(jumper)
   alwaysOnReset(function() jumper:reset() end)
   
@@ -279,12 +279,31 @@ function love.load(arg)
   setupTwoButtonFurtherPuzzle()
 end
 
+function checkEnd(player)
+  local maxDistance=120
+  local squareDistance=Vector.squareDistance(player.position, jumper.position)
+  
+  if squareDistance > maxDistance*maxDistance then
+    return
+  end
+  
+  player.autoTarget = {x=jumper.position.x+player.hugOffset, y=jumper.position.y}
+  player.autoTargetFinished = function()
+    jumper.hide=true
+    player:hug()
+    bomb.disabled=true
+  end
+end
+
 function love.update(dt)
   for j=1,#updateList do
     updateList[j]:update(dt)
   end
   
   -- check for game end
+  for i=1,#playerList do
+    checkEnd(playerList[i])
+  end
 end
 
 function love.draw()

@@ -62,6 +62,10 @@ function Bomb:draw(camera)
 end
 
 function Bomb:update(dt)
+  if self.disabled then
+    return
+  end
+  
   self.time = self.time - dt
   if self.time <= 0.0 and not self.explosionSound:isPlaying() and self.time > -self.explosionTime then
     self.explosionSound:play()

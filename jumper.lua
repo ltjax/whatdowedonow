@@ -20,12 +20,21 @@ function Jumper:reset()
 end
 
 function Jumper:draw(camera)
+  if self.hide then
+    return
+  end
+  
   local cx,cy=camera:offsets()
   love.graphics.setColor(255, 255, 255, 255)
   self.animation:draw(cx+self.position.x, cy+self.position.y)
 end
 
 function Jumper:update(dt)
+  
+  if self.hide then
+    return
+  end
+  
   self.animation:update(dt)
   
   if self.timeOut <= 0.0 and self.animation.stopped then
