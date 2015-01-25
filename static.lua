@@ -11,5 +11,8 @@ end
 
 function Static:draw(camera)
   local cx, cy=camera:offsets()
+  love.graphics.setColor(160,160,160,255)
   love.graphics.draw(self.image, self.position.x+cx, self.position.y+cy)
 end
+
+return Static

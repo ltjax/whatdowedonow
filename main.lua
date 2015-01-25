@@ -13,6 +13,7 @@ local SmallBomb = require "SmallBomb"
 local Lamp = require "Lamp"
 local Vector = require "Vector"
 local Jumper = require "Jumper"
+local Static = require "Static"
 
 
 updateList = {}
@@ -21,8 +22,12 @@ onNextReset = {}
 onReset = {}
   
 local function insertEntity(entity)
-  table.insert(updateList, entity)
-  table.insert(drawableList, entity)  
+  if entity.update then
+    table.insert(updateList, entity)
+  end
+  if entity.draw then
+    table.insert(drawableList, entity) 
+  end
 end
 
 local function alwaysOnReset(f)
@@ -32,8 +37,8 @@ end
 function setupGame()
   -- Create players here
   playerList = {
-    Player:new("p/typin_p.png", "p/typin_dead.png"),
-    Player:new("p/typ_blond.png", "p/typ_blond_dead.png")
+    Player:new("p/typin_p.png", "p/typin_dead.png", "p/hug_f.png", 64),
+    Player:new("p/typ_blond.png", "p/typ_blond_dead.png", "p/hug_m.png", 64)
   }
 
   cameraList = {
@@ -50,7 +55,7 @@ function setupGame()
   end
 
   -- Add the bomb
-  local bomb=Bomb:new()
+  bomb=Bomb:new()
   insertEntity(bomb)
 
   -- Add Lamps
@@ -65,7 +70,7 @@ function setupGame()
   end
   
   -- Add the suicidal person
-  local jumper=Jumper:new(love.math.random(-300, 300), 2000)
+  jumper=Jumper:new(love.math.random(-300, 300), 2000)
   insertEntity(jumper)
   alwaysOnReset(function() jumper:reset() end)
   
@@ -83,8 +88,8 @@ function spawnChicken(x, y)
 end
 
 function rewardSpawnChicken()
-  local chickenCount = 50
-  local chickenRange = 3000
+  local chickenCount = 80
+  local chickenRange = 1800
   for i=1,chickenCount do
     local x=love.math.random(-chickenRange, chickenRange)
     local y=love.math.random(-chickenRange, chickenRange)
@@ -102,7 +107,7 @@ end
 function rewardSpawnGlowWorms()
   glowwormImage = love.graphics.newImage("p/glowworm.png")
   local glowwormCount = 240
-  local glowwormRange = 3000
+  local glowwormRange = 2000
   for i=1,glowwormCount do
     local x=love.math.random(-glowwormRange, glowwormRange)
     local y=love.math.random(-glowwormRange, glowwormRange)
@@ -237,6 +242,35 @@ function resetGame()
   end
 end
 
+function spawnStatics()
+  local imageFileList={
+    "p/bird_dead_l.png",
+    "p/bird_dead_r.png",
+    "p/flash_l.png",
+    "p/flash_r.png",
+    "p/flash_u.png",
+    "p/paper_l.png",
+    "p/paper_r.png",
+    "p/plant.png",
+    "p/stein1.png",
+    "p/stein2.png",
+    "p/stein3.png"
+  }
+  local imageList={}
+  for i=1,#imageFileList do
+    table.insert(imageList, love.graphics.newImage(imageFileList[i]))
+  end
+  
+  local objectCount = 140
+  local objectRange = 1900
+  for i=1,objectCount do
+    local x=love.math.random(-objectRange, objectRange)
+    local y=love.math.random(-objectRange, objectRange)
+    
+    insertEntity(Static:new(x, y, imageList[love.math.random(1, #imageList)]))
+  end
+end
+
 function love.resize(w, h)
   cameraList[1]:resize(0, 0, w/2, h)
   cameraList[2]:resize(w/2, 0, w/2, h)
@@ -271,6 +305,7 @@ function love.load(arg)
   backgroundMusic = love.audio.newSource("s/Main_ looperman-l-1327367-0079222-roadwarrior-its-not-the-same-without-you-sad-piano.wav")
 
   --spawnChicken()
+  spawnStatics()
   
   resetGame()
   setupBombPuzzle()
@@ -279,9 +314,34 @@ function love.load(arg)
   setupTwoButtonFurtherPuzzle()
 end
 
+function checkEnd(player)
+  local maxDistance=120
+  local squareDistance=Vector.squareDistance(player.position, jumper.position)
+  
+  if puzzlesSolved < 4 then
+    return
+  end
+  
+  if squareDistance > maxDistance*maxDistance then
+    return
+  end
+  
+  player.autoTarget = {x=jumper.position.x+player.hugOffset, y=jumper.position.y}
+  player.autoTargetFinished = function()
+    jumper.hide=true
+    player:hug()
+    bomb.disabled=true
+  end
+end
+
 function love.update(dt)
   for j=1,#updateList do
     updateList[j]:update(dt)
+  end
+  
+  -- check for game end
+  for i=1,#playerList do
+    checkEnd(playerList[i])
   end
 end
 

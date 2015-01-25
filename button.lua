@@ -42,7 +42,7 @@ function Button:draw(camera)
   love.graphics.setColor(120, 120, 120, 255)
   love.graphics.draw(self.image, quad, self.position.x+cx-32, self.position.y+cy-32)
   
-  if self.totalPressTime>0 then
+  if self.totalPressTime>0 and self.currentPressTime>0 and not self.activated then
     love.graphics.rectangle("line", self.position.x+cx-32, self.position.y+cy+32+8, 64, 8)
     love.graphics.rectangle("fill", self.position.x+cx-32, self.position.y+cy+32+8, 64*self.currentPressTime/self.totalPressTime, 8)
   end
