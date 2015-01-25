@@ -100,6 +100,7 @@ function fullReset()
   drawableList = {}
   onNextReset = {}
   onReset = {}
+  cameraList = {}
 
   backgroundMusic:stop()
   love.load(startArgs)
