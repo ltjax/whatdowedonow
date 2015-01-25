@@ -369,6 +369,7 @@ function love.load(arg)
   setupLongDistancePuzzle()
   setupLongDistancePuzzleGrave()
   setupTwoButtonFurtherPuzzle()
+  puzzleCount=5
   
   introMusic:setLooping(true)
   introMusic:play()
@@ -379,7 +380,7 @@ function checkEnd(player)
   local maxDistance=120
   local squareDistance=Vector.squareDistance(player.position, jumper.position)
   
-  if puzzlesSolved < 4 then
+  if puzzlesSolved < puzzleCount then
     return
   end
   
