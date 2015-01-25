@@ -217,7 +217,7 @@ function setupLongDistancePuzzle()
   
   door.stateChanged = function()
     table.insert(onNextReset, function()
-      spawnDogReward()
+      rewardSpawnDog()
     end)
     puzzlesSolved = puzzlesSolved + 1
   end
