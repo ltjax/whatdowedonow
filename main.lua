@@ -10,6 +10,8 @@ local Button = require "Button"
 local Door = require "Door"
 local Animal = require "Animal"
 local SmallBomb = require "SmallBomb"
+local Lamp = require "Lamp"
+
 
 updateList = {}
 drawableList = {}
@@ -48,6 +50,17 @@ function setupGame()
   -- Add the bomb
   local bomb=Bomb:new()
   insertEntity(bomb)
+
+  -- Add Lamps
+  local lampImage = love.graphics.newImage("p/lamp.png")
+  local lampImageGlow = love.graphics.newImage("p/lamp_glow.png")
+  local lampPositions = {
+    {768,0}, {-768,0}, {0,768}, {0,-768}, 
+    {-1024, -1024}, {-1024,1024}, {1024,1024},{1024,-1024},
+  }
+  for i=1,#lampPositions do
+    insertEntity(Lamp:new(lampPositions[i][1], lampPositions[i][2], lampImage, lampImageGlow))
+  end
   
   puzzlesSolved = 0
 
@@ -62,18 +75,25 @@ function setupBombPuzzle()
 end
 
 function setupTwoButtonPuzzle()
-  local button1=Button:new(1100, 1000, playerList, true, true, "p/schalt_4.png")
+  local button1=Button:new(500, 500, playerList, true, true, "p/schalt_4.png")
   insertEntity(button1)
 
-  local button2=Button:new(1180, 1060, playerList, true, true, "p/schalt_4.png")
+  local button2=Button:new(600, 500, playerList, true, true, "p/schalt_4.png")
   insertEntity(button2)
   
   local function stateChanged()
     if button1.activated and button2.activated then
       button1.locked=true
       button2.locked=true
+
+      for j=1,#updateList do
+        -- find all lamps and turn them on
+        if updateList[j]:isInstanceOf(Lamp) then
+          updateList[j].turnedOn = true
+        end
+      end
+
       table.insert(onNextReset, function()
-        addGlowWorms()
         puzzlesSolved = puzzlesSolved + 1
       end)  
     end
