@@ -21,11 +21,15 @@ local inIntro=true
 local inEnd=false
 local endFade=0.0
 local creditsTimeout=10.0
+local bothDeadTime=0
 
 updateList = {}
 drawableList = {}
 onNextReset = {}
 onReset = {}
+cameraList = {}
+
+startArgs = nil
   
 local function insertEntity(entity)
   if entity.update then
@@ -85,6 +89,20 @@ function setupGame()
   
   puzzlesSolved = 0
 
+end
+
+function fullReset()
+  inIntro=true
+  inEnd=false
+  endFade=0.0
+
+  updateList = {}
+  drawableList = {}
+  onNextReset = {}
+  onReset = {}
+
+  backgroundMusic:stop()
+  love.load(startArgs)
 end
 
 
@@ -303,6 +321,7 @@ function setupLongDistancePuzzleGrave() -- Grave
 end
 
 function resetGame()
+  bothDeadTime = 0
   playerList[1]:setPosition(-130, 0)
   playerList[2]:setPosition(130, 0)
   cameraList[1]:setPosition(0, 0)
@@ -359,6 +378,8 @@ function love.load(arg)
   if
     arg[#arg] == "-debug" then require("mobdebug").start()
   end
+
+  startArgs = arg -- remember args so we can call love.load again on full reset
   
   setupGame()
   
@@ -458,6 +479,16 @@ function love.update(dt)
     for i=1,#playerList do
       checkEnd(playerList[i])
     end
+    
+    -- check game over (both players dead for 1 sec)
+    if playerList[1].dead and playerList[2].dead then
+      bothDeadTime = bothDeadTime + dt
+      if bothDeadTime > 2 then
+        fullReset();
+        return
+      end
+    end
+
   end
 end
 
