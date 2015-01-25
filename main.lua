@@ -234,12 +234,7 @@ function love.draw()
     cameraList[i]:setScissor()
     love.graphics.setColor(64, 64, 64)
     
-    --cameraList[i]:draw(backgroundTexture, -2048, -2048)
-    for x=-1,1 do
-      for y=-1,1 do
-        cameraList[i]:draw(backgroundTexture, -1024+x*2048, -1024+y*2048)
-      end
-    end
+    cameraList[i]:draw(backgroundTexture, -2048, -2048)
     for j=1,#drawableList do
       drawableList[j]:draw(cameraList[i])
     end
