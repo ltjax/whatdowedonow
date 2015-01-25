@@ -83,8 +83,8 @@ function spawnChicken(x, y)
 end
 
 function rewardSpawnChicken()
-  local chickenCount = 50
-  local chickenRange = 3000
+  local chickenCount = 100
+  local chickenRange = 2000
   for i=1,chickenCount do
     local x=love.math.random(-chickenRange, chickenRange)
     local y=love.math.random(-chickenRange, chickenRange)
@@ -102,7 +102,7 @@ end
 function rewardSpawnGlowWorms()
   glowwormImage = love.graphics.newImage("p/glowworm.png")
   local glowwormCount = 240
-  local glowwormRange = 3000
+  local glowwormRange = 2000
   for i=1,glowwormCount do
     local x=love.math.random(-glowwormRange, glowwormRange)
     local y=love.math.random(-glowwormRange, glowwormRange)

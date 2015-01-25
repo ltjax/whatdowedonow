@@ -64,7 +64,7 @@ function Player:update(deltaTime)
       self.action=true
     end
     
-    local mapBorder=2048
+    local mapBorder=1990
     self.position.x=math.max(-mapBorder, math.min(mapBorder, self.position.x))
     self.position.y=math.max(-mapBorder, math.min(mapBorder, self.position.y))
   end
