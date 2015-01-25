@@ -229,7 +229,6 @@ function setupLongDistancePuzzle()
 end
 
 function resetGame()
-  backgroundMusic:play()
   playerList[1]:setPosition(-130, 0)
   playerList[2]:setPosition(130, 0)
   cameraList[1]:setPosition(0, 0)
@@ -321,7 +320,7 @@ function love.load(arg)
   backgroundTexture=love.graphics.newImage("p/sand_grey.png")
     
   backgroundMusic = love.audio.newSource("s/Main_ looperman-l-1327367-0079222-roadwarrior-its-not-the-same-without-you-sad-piano.wav")
-
+  introMusic = love.audio.newSource("s/Intro_looperman-l-1247377-0080333-xyilent-xyilent-uplifting-lead.wav")
   --spawnChicken()
   spawnStatics()
   
@@ -330,15 +329,19 @@ function love.load(arg)
   setupTwoButtonPuzzle()
   setupLongDistancePuzzle()
   setupTwoButtonFurtherPuzzle()
+  
+  introMusic:setLooping(true)
+  introMusic:play()
+  
 end
 
 function checkEnd(player)
   local maxDistance=120
   local squareDistance=Vector.squareDistance(player.position, jumper.position)
   
-  --if puzzlesSolved < 4 then
-  --  return
-  --end
+  if puzzlesSolved < 4 then
+    return
+  end
   
   if squareDistance > maxDistance*maxDistance then
     return
@@ -383,6 +386,11 @@ end
 
 function love.keypressed( key, isrepeat )
   inIntro = false
+  introMusic:stop()
+  backgroundMusic:play()
+  alwaysOnReset(function() 
+    backgroundMusic:play()
+  end)
 end
 
 function love.draw()
