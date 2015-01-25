@@ -314,6 +314,8 @@ function love.load(arg)
   setupTwoButtonFurtherPuzzle()
 end
 
+local endBlend = -1
+
 function checkEnd(player)
   local maxDistance=120
   local squareDistance=Vector.squareDistance(player.position, jumper.position)
@@ -331,6 +333,7 @@ function checkEnd(player)
     jumper.hide=true
     player:hug()
     bomb.disabled=true
+    player.huggingFinished = function() end
   end
 end
 
