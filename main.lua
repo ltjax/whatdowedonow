@@ -83,8 +83,8 @@ function spawnChicken(x, y)
 end
 
 function rewardSpawnChicken()
-  local chickenCount = 100
-  local chickenRange = 2000
+  local chickenCount = 80
+  local chickenRange = 1800
   for i=1,chickenCount do
     local x=love.math.random(-chickenRange, chickenRange)
     local y=love.math.random(-chickenRange, chickenRange)
@@ -283,6 +283,8 @@ function love.update(dt)
   for j=1,#updateList do
     updateList[j]:update(dt)
   end
+  
+  -- check for game end
 end
 
 function love.draw()
