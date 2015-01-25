@@ -17,6 +17,12 @@ function SimpleAnimation:initialize(image, count, frameTime)
   self.stopped=true
 end
 
+function SimpleAnimation:reset()
+  self.currentFrame=1
+  self.currentTimer=0.0
+  self.stopped=true
+end
+
 function SimpleAnimation:start()
   self.stopped=false
 end

@@ -8,10 +8,19 @@ local SmallBomb=class("SmallBomb")
 function SmallBomb:initialize(x, y, playerList)
   self.playerList=playerList
   self.position={x=x, y=y}
+  self.initialPosition={x=x, y=y}
+  
   self.animation=SimpleAnimation:new("p/bumb.png", 8, 0.25)
   self.triggered=false
   self.explosionTime = -1
   self.explosionRadius = 200
+end
+
+function SmallBomb:reset()
+  self.position={x=self.initialPosition.x, y=self.initialPosition.y}
+  self.triggered=false
+  self.animation:reset()
+  self.explosionTime = -1
 end
 
 function SmallBomb:draw(camera)
@@ -25,6 +34,11 @@ function SmallBomb:draw(camera)
     love.graphics.setColor(255,50,50,255)
     love.graphics.circle("fill", self.position.x+cx, self.position.y+cy, radius, 100)
   end
+end
+
+function SmallBomb:inExplosionRange(position)
+  local squareDistance=Vector.squareDistance(position, self.position)
+  return squareDistance < self.explosionRadius*self.explosionRadius
 end
 
 function SmallBomb:update(dt)
@@ -69,11 +83,13 @@ function SmallBomb:update(dt)
     
     for i=1,#self.playerList do
       local player=self.playerList[i]
-      local maxDistance=30
-      local squareDistance=Vector.squareDistance(player.position, self.position)
-      if squareDistance < self.explosionRadius*self.explosionRadius then
+      if self:inExplosionRange(player.position) then
         player:kill()
       end
+    end
+    
+    if self.onExplode then
+      self.onExplode()
     end
   end
   

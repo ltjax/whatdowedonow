@@ -19,6 +19,7 @@ function Player:setPosition(x,y)
   self.position= {x=x, y=y}
   self.walker:reset()
   self.dead=false
+  self.dyingAnimation:reset()
 end
 
 function Player:kill()

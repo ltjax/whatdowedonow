@@ -14,10 +14,22 @@ function Button:initialize(x, y, playerList, explicitAction, volatile, imageName
   self.image=love.graphics.newImage(imageName)
   self.totalPressTime=pressTime or 0
   self.currentPressTime=0
+  self.hidden=false
 end
 
+function Button:hide()
+  self.hidden=true
+end
+
+function Button:show()
+  self.hidden=false
+end
 
 function Button:draw(camera)
+  if self.hidden then
+    return
+  end
+  
   local quad
   local tileSize=64
   if self.activated then
@@ -30,14 +42,14 @@ function Button:draw(camera)
   love.graphics.setColor(120, 120, 120, 255)
   love.graphics.draw(self.image, quad, self.position.x+cx-32, self.position.y+cy-32)
   
-  if self.totalPressTime then
+  if self.totalPressTime>0 then
     love.graphics.rectangle("line", self.position.x+cx-32, self.position.y+cy+32+8, 64, 8)
     love.graphics.rectangle("fill", self.position.x+cx-32, self.position.y+cy+32+8, 64*self.currentPressTime/self.totalPressTime, 8)
   end
 end
 
 function Button:update(dt)
-  if self.locked then
+  if self.locked or self.hidden then
     return
   end
   

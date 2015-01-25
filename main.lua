@@ -10,6 +10,7 @@ local Button = require "Button"
 local Door = require "Door"
 local Animal = require "Animal"
 local SmallBomb = require "SmallBomb"
+local Vector = require "Vector"
 
 updateList = {}
 drawableList = {}
@@ -22,7 +23,7 @@ local function insertEntity(entity)
 end
 
 local function alwaysOnReset(f)
-  table.insert(onReset, resetHandler)
+  table.insert(onReset, f)
 end
 
 function setupGame()
@@ -54,11 +55,30 @@ function setupGame()
 end
 
 function setupBombPuzzle()
-  local button=Button:new(-20, -260, playerList, true, false, "p/schalt_4.png", 2.0)
+  local px, py=-300,-500
+  local button=Button:new(-20+px, -260+py, playerList, true, false, "p/schalt_4.png", 2.0)
   insertEntity(button)
   
-  local smallBomb=SmallBomb:new(0, -200, playerList)
+  local smallBomb=SmallBomb:new(30+px, -230+py, playerList)
   insertEntity(smallBomb)
+  smallBomb.onExplode = function()
+    if smallBomb:inExplosionRange(button.position) then
+      button:hide()
+    end
+  end
+  
+  alwaysOnReset(function()
+    button:show()
+    smallBomb:reset()
+  end)
+  
+  button.stateChanged = function()
+    table.insert(onNextReset, function()
+      spawnChicken()
+    end)
+  
+    puzzlesSolved = puzzlesSolved + 1
+  end
 end
 
 function setupTwoButtonPuzzle()
@@ -105,16 +125,14 @@ function setupLongDistancePuzzle()
     spawnDog()
     puzzlesSolved = puzzlesSolved + 1
   end
-  
-  table.insert(onNextReset, resetHandler)
 end
 
 -- Add glow worms
 function addGlowWorms()
   
   glowwormImage = love.graphics.newImage("p/glowworm.png")
-  local glowwormCount = 40
-  local glowwormRange = 1000
+  local glowwormCount = 240
+  local glowwormRange = 3000
   for i=1,glowwormCount do
     local x=love.math.random(-glowwormRange, glowwormRange)
     local y=love.math.random(-glowwormRange, glowwormRange)
