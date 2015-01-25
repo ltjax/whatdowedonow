@@ -14,6 +14,7 @@ local Lamp = require "Lamp"
 local Vector = require "Vector"
 local Jumper = require "Jumper"
 local Static = require "Static"
+local Grave = require "Grave"
 
 
 local inIntro=true
@@ -69,6 +70,9 @@ function setupGame()
   for i=1,#lampPositions do
     insertEntity(Lamp:new(lampPositions[i][1], lampPositions[i][2], lampImage, lampImageGlow))
   end
+
+  -- Add Grave
+  insertEntity(Grave:new(-1024, 300))
   
   -- Add the suicidal person
   jumper=Jumper:new(love.math.random(-300, 300), 2000)
@@ -122,6 +126,15 @@ function rewardTurnOnLamps()
     -- find all lamps and turn them on
     if updateList[j]:isInstanceOf(Lamp) then
       updateList[j].turnedOn = true
+    end
+  end
+end
+
+function rewardAddCandleToGrave()
+  for j=1,#updateList do
+    -- find the grave
+    if updateList[j]:isInstanceOf(Grave) then
+      updateList[j].hasCandle = true
     end
   end
 end
@@ -224,6 +237,32 @@ function setupLongDistancePuzzle()
   end
 end
 
+function setupLongDistancePuzzleGrave() -- Grave
+  
+  local button=Button:new(1100, 1300, playerList, true, false, "p/schalt_1.png")
+  insertEntity(button)
+  
+  local door=Door:new(-1500, -1300, playerList)
+  insertEntity(door)
+  door.locked=true
+  
+  button.stateChanged = function()
+    door.locked=false
+  end
+  
+  alwaysOnReset(function()
+    button.activated=false
+    door.locked=true
+  end)
+  
+  door.stateChanged = function()
+    table.insert(onNextReset, function()
+      rewardAddCandleToGrave()
+    end)
+    puzzlesSolved = puzzlesSolved + 1
+  end
+end
+
 function resetGame()
   backgroundMusic:play()
   playerList[1]:setPosition(-130, 0)
@@ -321,6 +360,7 @@ function love.load(arg)
   setupBombPuzzle()
   setupTwoButtonPuzzle()
   setupLongDistancePuzzle()
+  setupLongDistancePuzzleGrave()
   setupTwoButtonFurtherPuzzle()
 end
 
