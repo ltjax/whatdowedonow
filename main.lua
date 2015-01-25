@@ -106,6 +106,17 @@ function rewardSpawnChicken()
   end
 end
 
+function rewardSpawnPlants()
+  local count = 200
+  local range = 1800
+  local plantImage = love.graphics.newImage("p/plant.png")
+  for i=1,count do
+    local x=love.math.random(-range, range)
+    local y=love.math.random(-range, range)
+    insertEntity(Static:new(x, y, plantImage))
+  end
+end
+
 function rewardSpawnDog()
   local dog=Animal:new("p/bestDog.png", 60, 100)
   insertEntity(dog)
@@ -183,6 +194,30 @@ function setupTwoButtonPuzzle()
       rewardTurnOnLamps()
 
       table.insert(onNextReset, function()
+      end) 
+        
+      puzzlesSolved = puzzlesSolved + 1
+    end
+  end
+  
+  button1.stateChanged = stateChanged
+  button2.stateChanged = stateChanged
+end
+
+function setupTwoButtonPuzzleAtEdge()
+  local button1=Button:new(-1900, -500, playerList, true, true, "p/schalt_4.png")
+  insertEntity(button1)
+
+  local button2=Button:new(-1800, -500, playerList, true, true, "p/schalt_4.png")
+  insertEntity(button2)
+  
+  local function stateChanged()
+    if button1.activated and button2.activated then
+      button1.locked=true
+      button2.locked=true
+
+      table.insert(onNextReset, function()
+        rewardSpawnPlants()
       end) 
         
       puzzlesSolved = puzzlesSolved + 1
@@ -366,10 +401,11 @@ function love.load(arg)
   resetGame()
   setupBombPuzzle()
   setupTwoButtonPuzzle()
+  setupTwoButtonPuzzleAtEdge()
   setupLongDistancePuzzle()
   setupLongDistancePuzzleGrave()
   setupTwoButtonFurtherPuzzle()
-  puzzleCount=5
+  puzzleCount=6
   
   introMusic:setLooping(true)
   introMusic:play()
