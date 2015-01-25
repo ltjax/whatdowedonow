@@ -11,11 +11,11 @@ function Bomb:initialize()
   self.position = {x=0, y=0}
   self.explosionTime = 0.4
   self.drawLayer = 5
-  self.font = love.graphics.newFont("SourceCodePro-Semibold.otf", 16)
+  self.font = love.graphics.newFont("p/digital-7.ttf", 16)
   self.explosionSound = love.audio.newSource("s/explosion_  235968__tommccann__explosion-01.wav", "static")
   self.explosionSound:setLooping(false)
   self.explosionSound:setVolume(0.3)
-  self.image=love.graphics.newImage("p/badbomb.png")
+  self.image=love.graphics.newImage("p/bomb_big_bigger.png")
   self.haloImage=love.graphics.newImage("p/glowworm.png")
 end
 
@@ -26,7 +26,7 @@ end
 
 function Bomb:draw(camera)
   local ox, oy=camera:offsets()
-  love.graphics.draw(self.image, self.position.x + ox - 64, self.position.y + oy - 32)
+  love.graphics.draw(self.image, self.position.x + ox - self.image:getWidth()/2, self.position.y + oy - self.image:getHeight()/2)
   
   love.graphics.setBlendMode("additive") --Default blend mode
   love.graphics.setColor(255, 100, 100, 80)

@@ -73,6 +73,53 @@ function setupGame()
 
 end
 
+
+function spawnChicken(x, y)
+  local imageList={"p/huun.png", "p/huun_d.png", "p/huun_hpng.png"}
+  local chicken=Animal:new(imageList[love.math.random(1, #imageList)], 30, 20)
+  insertEntity(chicken)
+  chicken:setPosition(x, y)
+  alwaysOnReset(function() chicken:setPosition(x, y) end)
+end
+
+function rewardSpawnChicken()
+  local chickenCount = 50
+  local chickenRange = 3000
+  for i=1,chickenCount do
+    local x=love.math.random(-chickenRange, chickenRange)
+    local y=love.math.random(-chickenRange, chickenRange)
+    spawnChicken(x, y)
+  end
+end
+
+function rewardSpawnDog()
+  local dog=Animal:new("p/bestDog.png", 60, 100)
+  insertEntity(dog)
+  dog:setPosition(200, 200) 
+  alwaysOnReset(function() dog:setPosition(200, 200) end)
+end
+
+function rewardSpawnGlowWorms()
+  glowwormImage = love.graphics.newImage("p/glowworm.png")
+  local glowwormCount = 240
+  local glowwormRange = 3000
+  for i=1,glowwormCount do
+    local x=love.math.random(-glowwormRange, glowwormRange)
+    local y=love.math.random(-glowwormRange, glowwormRange)
+    
+    insertEntity(Glowworm:new(x, y, glowwormImage))
+  end
+end
+
+function rewardTurnOnLamps()
+  for j=1,#updateList do
+    -- find all lamps and turn them on
+    if updateList[j]:isInstanceOf(Lamp) then
+      updateList[j].turnedOn = true
+    end
+  end
+end
+
 function setupBombPuzzle()
   local px, py=-300,-500
   local button=Button:new(-20+px, -260+py, playerList, true, false, "p/schalt_4.png", 2.0)
@@ -92,9 +139,7 @@ function setupBombPuzzle()
   end)
   
   button.stateChanged = function()
-    table.insert(onNextReset, function()
-      spawnChicken()
-    end)
+    table.insert(onNextReset, rewardSpawnGlowWorms)
   
     puzzlesSolved = puzzlesSolved + 1
   end
@@ -112,15 +157,32 @@ function setupTwoButtonPuzzle()
       button1.locked=true
       button2.locked=true
 
-      for j=1,#updateList do
-        -- find all lamps and turn them on
-        if updateList[j]:isInstanceOf(Lamp) then
-          updateList[j].turnedOn = true
-        end
-      end
+      rewardTurnOnLamps()
 
       table.insert(onNextReset, function()
       end) 
+        
+      puzzlesSolved = puzzlesSolved + 1
+    end
+  end
+  
+  button1.stateChanged = stateChanged
+  button2.stateChanged = stateChanged
+end
+
+function setupTwoButtonFurtherPuzzle()
+  local button1=Button:new(-220, -1400, playerList, true, true, "p/schalt_4.png")
+  insertEntity(button1)
+
+  local button2=Button:new(400, -1200, playerList, true, true, "p/schalt_4.png")
+  insertEntity(button2)
+  
+  local function stateChanged()
+    if button1.activated and button2.activated then
+      button1.locked=true
+      button2.locked=true
+
+      table.insert(onNextReset, rewardSpawnChicken) 
         
       puzzlesSolved = puzzlesSolved + 1
     end
@@ -150,45 +212,16 @@ function setupLongDistancePuzzle()
   
   door.stateChanged = function()
     table.insert(onNextReset, function()
-      spawnDog()
+      spawnDogReward()
     end)
     puzzlesSolved = puzzlesSolved + 1
   end
 end
 
--- Add glow worms
-function addGlowWorms()
-  
-  glowwormImage = love.graphics.newImage("p/glowworm.png")
-  local glowwormCount = 240
-  local glowwormRange = 3000
-  for i=1,glowwormCount do
-    local x=love.math.random(-glowwormRange, glowwormRange)
-    local y=love.math.random(-glowwormRange, glowwormRange)
-    
-    insertEntity(Glowworm:new(x, y, glowwormImage))
-  end
-end
-
-function spawnDog()
-  local dog=Animal:new("p/bestDog.png", 60, 100)
-  insertEntity(dog)
-  dog:setPosition(200, 200) 
-  alwaysOnReset(function() dog:setPosition(200, 200) end)
-end
-
-function spawnChicken()
-  local imageList={"p/huun.png", "p/huun_d.png", "p/huun_hpng.png"}
-  local chicken=Animal:new(imageList[love.math.random(1, #imageList)], 30, 20)
-  insertEntity(chicken)
-  chicken:setPosition(-140, -130)
-  alwaysOnReset(function() chicken:setPosition(-140, -130) end)
-end
-
 function resetGame()
   backgroundMusic:play()
-  playerList[1]:setPosition(-100, 0)
-  playerList[2]:setPosition(100, 0)
+  playerList[1]:setPosition(-130, 0)
+  playerList[2]:setPosition(130, 0)
   cameraList[1]:setPosition(0, 0)
   cameraList[2]:setPosition(0, 0)
   
@@ -243,6 +276,7 @@ function love.load(arg)
   setupBombPuzzle()
   setupTwoButtonPuzzle()
   setupLongDistancePuzzle()
+  setupTwoButtonFurtherPuzzle()
 end
 
 function love.update(dt)
