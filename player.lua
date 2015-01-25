@@ -3,9 +3,9 @@ local class = require "middleclass"
 assert(class, "Unable to load middleclass")
 
 local Player=class('Player')
-local Walker= require "Walker"
-local SimpleAnimation = require "SimpleAnimation"
-local Vector = require "Vector"
+local Walker= require "walker"
+local SimpleAnimation = require "simpleanimation"
+local Vector = require "vector"
 
 function Player:initialize(image, dyingImage, hugImage, hugOffset)
   self.speed = 160.0

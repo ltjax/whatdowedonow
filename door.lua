@@ -2,7 +2,7 @@ local class = require "middleclass"
 assert(class, "Unable to load middleclass")
 
 local Door=class('Door')
-local Vector=require "Vector"
+local Vector=require "vector"
 
 function Door:initialize(x, y, playerList)
   self.activated=false

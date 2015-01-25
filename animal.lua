@@ -1,6 +1,6 @@
 local class = require "middleclass"
-local Vector = require "Vector"
-local Walker = require "Walker"
+local Vector = require "vector"
+local Walker = require "walker"
 
 local Animal = class("Animal")
 

@@ -2,18 +2,18 @@
 local class = require "middleclass"
 assert(class, "Unable to load middleclass")
 
-local Player= require "Player"
-local Camera = require "Camera"
-local Bomb = require "Bomb"
-local Glowworm = require "Glowworm"
-local Button = require "Button"
-local Door = require "Door"
-local Animal = require "Animal"
-local SmallBomb = require "SmallBomb"
-local Lamp = require "Lamp"
-local Vector = require "Vector"
-local Jumper = require "Jumper"
-local Static = require "Static"
+local Player= require "player"
+local Camera = require "camera"
+local Bomb = require "bomb"
+local Glowworm = require "glowworm"
+local Button = require "button"
+local Door = require "door"
+local Animal = require "animal"
+local SmallBomb = require "smallbomb"
+local Lamp = require "lamp"
+local Vector = require "vector"
+local Jumper = require "jumper"
+local Static = require "static"
 
 
 local inIntro=true

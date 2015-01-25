@@ -3,7 +3,7 @@ local class = require "middleclass"
 assert(class, "Unable to load middleclass")
 
 local Jumper=class("Jumper")
-local SimpleAnimation= require "SimpleAnimation"
+local SimpleAnimation= require "simpleanimation"
 
 function Jumper:initialize(x, y)
   self.position={x=x, y=y}

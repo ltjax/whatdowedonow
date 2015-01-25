@@ -1,7 +1,7 @@
 local class = require "middleclass"
-local Vector = require "Vector"
+local Vector = require "vector"
 
-local SimpleAnimation=require "SimpleAnimation"
+local SimpleAnimation=require "simpleanimation"
 
 local SmallBomb=class("SmallBomb")
 

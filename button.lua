@@ -2,7 +2,7 @@ local class = require "middleclass"
 assert(class, "Unable to load middleclass")
 
 local Button=class('Button')
-local Vector=require "Vector"
+local Vector=require "vector"
 
 function Button:initialize(x, y, playerList, explicitAction, volatile, imageName, pressTime)
   self.activated=false
