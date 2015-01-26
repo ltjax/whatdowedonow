@@ -407,7 +407,7 @@ function love.load(arg)
   playerList[1]:setJoystick(joystickList[1])
   playerList[2]:setJoystick(joystickList[2])
   playerList[1]:setKeys({'w', 'a', 's', 'd', 'q'})
-  playerList[2]:setKeys({'up', 'left', 'down', 'right', 'rctrl'})
+  playerList[2]:setKeys({'up', 'left', 'down', 'right', ' '})
     
   local cameraDistance = 100
   cameraList[1]:setFollowTargets(playerList[1], playerList[2], cameraDistance)
