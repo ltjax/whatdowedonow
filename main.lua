@@ -137,7 +137,7 @@ function rewardSpawnPlants()
 end
 
 function rewardSpawnDog()
-  local dog=Animal:new("p/bestDog.png", 60, 100)
+  local dog=Animal:new("p/bestdog.png", 60, 100)
   insertEntity(dog)
   dog:setPosition(200, 200) 
   alwaysOnReset(function() dog:setPosition(200, 200) end)
