@@ -126,7 +126,7 @@ function rewardSpawnChicken()
 end
 
 function rewardSpawnPlants()
-  local count = 200
+  local count = 2000
   local range = 1800
   local plantImage = love.graphics.newImage("p/plant.png")
   for i=1,count do
