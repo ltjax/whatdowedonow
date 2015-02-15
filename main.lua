@@ -413,7 +413,7 @@ function love.load(arg)
   cameraList[1]:setFollowTargets(playerList[1], playerList[2], cameraDistance)
   cameraList[2]:setFollowTargets(playerList[2], playerList[1], cameraDistance)
   
-  backgroundTexture=love.graphics.newImage("p/sand_grey.png")
+  backgroundTexture=love.graphics.newImage("p/sand_grey.jpg")
     
   backgroundMusic = love.audio.newSource("s/Main_ looperman-l-1327367-0079222-roadwarrior-its-not-the-same-without-you-sad-piano.wav")
   backgroundMusic:setLooping(false)
