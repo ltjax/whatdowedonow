@@ -496,12 +496,14 @@ function love.update(dt)
 end
 
 function love.keypressed( key, isrepeat )
-  inIntro = false
-  introMusic:stop()
-  backgroundMusic:play()
-  alwaysOnReset(function() 
+  if inIntro then
+    inIntro = false
+    introMusic:stop()
     backgroundMusic:play()
-  end)
+    alwaysOnReset(function() 
+      backgroundMusic:play()
+    end)
+  end
 end
 
 function love.draw()
