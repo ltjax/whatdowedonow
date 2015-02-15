@@ -416,6 +416,8 @@ function love.load(arg)
   backgroundTexture=love.graphics.newImage("p/sand_grey.png")
     
   backgroundMusic = love.audio.newSource("s/Main_ looperman-l-1327367-0079222-roadwarrior-its-not-the-same-without-you-sad-piano.wav")
+  backgroundMusic:setLooping(false)
+  
   introMusic = love.audio.newSource("s/Intro_looperman-l-1247377-0080333-xyilent-xyilent-uplifting-lead.wav")
   --spawnChicken()
   spawnStatics()
