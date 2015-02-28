@@ -80,7 +80,7 @@ function setupGame()
   end
 
   -- Add Grave
-  insertEntity(Grave:new(-1024, 300))
+  insertEntity(Grave:new(-300, -100))
   
   -- Add the suicidal person
   jumper=Jumper:new(love.math.random(-300, 300), 2000)
@@ -126,7 +126,7 @@ function rewardSpawnChicken()
 end
 
 function rewardSpawnPlants()
-  local count = 2000
+  local count = 1000
   local range = 1800
   local plantImage = love.graphics.newImage("p/plant.png")
   for i=1,count do
@@ -173,8 +173,8 @@ function rewardAddCandleToGrave()
   end
 end
 
-function setupBombPuzzle()
-  local px, py=-300,-500
+function setupBombPuzzle() --6
+  local px, py=-900, 900
   local button=Button:new(-20+px, -260+py, playerList, true, false, "p/schalt_4.png", 2.0)
   insertEntity(button)
   
@@ -198,11 +198,11 @@ function setupBombPuzzle()
   end
 end
 
-function setupTwoButtonPuzzle()
-  local button1=Button:new(500, 500, playerList, true, true, "p/schalt_4.png")
+function setupTwoButtonPuzzle() --1
+  local button1=Button:new(100, 200, playerList, true, true, "p/schalt_4.png")
   insertEntity(button1)
 
-  local button2=Button:new(600, 500, playerList, true, true, "p/schalt_4.png")
+  local button2=Button:new(-100, 200, playerList, true, true, "p/schalt_4.png")
   insertEntity(button2)
   
   local function stateChanged()
@@ -210,7 +210,7 @@ function setupTwoButtonPuzzle()
       button1.locked=true
       button2.locked=true
 
-      rewardTurnOnLamps()
+      rewardAddCandleToGrave()
 
       table.insert(onNextReset, function()
       end) 
@@ -223,11 +223,11 @@ function setupTwoButtonPuzzle()
   button2.stateChanged = stateChanged
 end
 
-function setupTwoButtonPuzzleAtEdge()
-  local button1=Button:new(-1900, -500, playerList, true, true, "p/schalt_4.png")
+function setupTwoButtonPuzzleAtEdge() --4
+  local button1=Button:new(900, -1800, playerList, true, true, "p/schalt_4.png")
   insertEntity(button1)
 
-  local button2=Button:new(-1800, -500, playerList, true, true, "p/schalt_4.png")
+  local button2=Button:new(-1500, 1500, playerList, true, true, "p/schalt_4.png")
   insertEntity(button2)
   
   local function stateChanged()
@@ -247,11 +247,11 @@ function setupTwoButtonPuzzleAtEdge()
   button2.stateChanged = stateChanged
 end
 
-function setupTwoButtonFurtherPuzzle()
-  local button1=Button:new(-220, -1400, playerList, true, true, "p/schalt_4.png")
+function setupTwoButtonFurtherPuzzle() --5
+  local button1=Button:new(-1800, -1800, playerList, true, true, "p/schalt_4.png")
   insertEntity(button1)
 
-  local button2=Button:new(400, -1200, playerList, true, true, "p/schalt_4.png")
+  local button2=Button:new(1800, -1800, playerList, true, true, "p/schalt_4.png")
   insertEntity(button2)
   
   local function stateChanged()
@@ -269,12 +269,12 @@ function setupTwoButtonFurtherPuzzle()
   button2.stateChanged = stateChanged
 end
 
-function setupLongDistancePuzzle()
+function setupLongDistancePuzzle() --2
   
-  local button=Button:new(1100, -1300, playerList, true, false, "p/schalt_1.png")
+  local button=Button:new(0, -900, playerList, true, false, "p/schalt_1.png")
   insertEntity(button)
   
-  local door=Door:new(-1500, 1300, playerList)
+  local door=Door:new(0, 900, playerList)
   insertEntity(door)
   door.locked=true
   
@@ -295,12 +295,12 @@ function setupLongDistancePuzzle()
   end
 end
 
-function setupLongDistancePuzzleGrave() -- Grave
+function setupLongDistancePuzzleGrave() -- not Grave anymore -- 3 -- sry
   
-  local button=Button:new(1100, 1300, playerList, true, false, "p/schalt_1.png")
+  local button=Button:new(-1500, -1800, playerList, true, false, "p/schalt_1.png")
   insertEntity(button)
   
-  local door=Door:new(-1500, -1300, playerList)
+  local door=Door:new(0, 1200, playerList)
   insertEntity(door)
   door.locked=true
   
@@ -315,7 +315,8 @@ function setupLongDistancePuzzleGrave() -- Grave
   
   door.stateChanged = function()
     table.insert(onNextReset, function()
-      rewardAddCandleToGrave()
+      
+      rewardTurnOnLamps()
     end)
     puzzlesSolved = puzzlesSolved + 1
   end
@@ -415,10 +416,10 @@ function love.load(arg)
   
   backgroundTexture=love.graphics.newImage("p/sand_grey.jpg")
     
-  backgroundMusic = love.audio.newSource("s/Main_ looperman-l-1327367-0079222-roadwarrior-its-not-the-same-without-you-sad-piano.wav")
+  backgroundMusic = love.audio.newSource("s/Main.mp3")
   backgroundMusic:setLooping(false)
   
-  introMusic = love.audio.newSource("s/Intro_looperman-l-1247377-0080333-xyilent-xyilent-uplifting-lead.wav")
+  introMusic = love.audio.newSource("s/Intro.mp3")
   --spawnChicken()
   spawnStatics()
   

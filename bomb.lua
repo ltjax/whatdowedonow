@@ -12,7 +12,7 @@ function Bomb:initialize()
   self.explosionTime = 0.4
   self.drawLayer = 5
   self.font = love.graphics.newFont("p/digital-7.ttf", 16)
-  self.explosionSound = love.audio.newSource("s/explosion_  235968__tommccann__explosion-01.wav", "static")
+  self.explosionSound = love.audio.newSource("s/Bomb.mp3", "static")
   self.explosionSound:setLooping(false)
   self.explosionSound:setVolume(0.3)
   self.image=love.graphics.newImage("p/bomb_big_bigger.png")
@@ -29,15 +29,15 @@ function Bomb:draw(camera)
   love.graphics.draw(self.image, self.position.x + ox - self.image:getWidth()/2, self.position.y + oy - self.image:getHeight()/2)
   
   love.graphics.setBlendMode("additive") --Default blend mode
-  love.graphics.setColor(200, 50, 50, 80)
-  local flickerTime=0.5
-  local haloScale=50+math.sin(math.fmod(self.time, flickerTime)/flickerTime*math.pi)*2
+  love.graphics.setColor(50, 50, 50, 80)
+  local flickerTime=1
+  local haloScale=100+math.sin(math.fmod(self.time, flickerTime)/flickerTime*math.pi)*2
   love.graphics.draw(self.haloImage, self.position.x + ox - haloScale*self.haloImage:getWidth()/2, self.position.y + oy - haloScale*self.haloImage:getHeight()/2, 0, haloScale, haloScale)
   love.graphics.setBlendMode("alpha") --Default blend mode
   
   local time=self.time
   if time < 0 then
-    love.graphics.setColor(255, 10, 10, 255);
+    love.graphics.setColor(10, 10, 10, 255);
     time = 0
   else
     love.graphics.setColor(255, 255, 255, 255);    
@@ -50,11 +50,11 @@ function Bomb:draw(camera)
   
   if self.time < 0.0 then
     if self.time > -self.explosionTime then
-      love.graphics.setColor(255, 0, 0, 255);
+      love.graphics.setColor(255, 255, 255, 255);
       local radius=math.pow(-self.time/self.explosionTime, 3.0) * 3000
       love.graphics.circle("fill", self.position.x+ox, self.position.y+oy, radius, 100); -- Draw white circle with 100 segments.
     else
-      love.graphics.setColor(255, 0, 0, 255);
+      love.graphics.setColor(255, 255, 255, 255);
       love.graphics.rectangle("fill", camera.offset.x, camera.offset.y, camera.size.x, camera.size.y)
     end
   end
