@@ -21,7 +21,6 @@ local inIntro=true
 local inEnd=false
 local endFade=0.0
 local creditsTimeout=10.0
-local bothDeadTime=0
 
 updateList = {}
 drawableList = {}
@@ -323,7 +322,6 @@ function setupLongDistancePuzzleGrave() -- not Grave anymore -- 3 -- sry
 end
 
 function resetGame()
-  bothDeadTime = 0
   playerList[1]:setPosition(-130, 0)
   playerList[2]:setPosition(130, 0)
   cameraList[1]:setPosition(0, 0)
@@ -483,16 +481,6 @@ function love.update(dt)
     for i=1,#playerList do
       checkEnd(playerList[i])
     end
-    
-    -- check game over (both players dead for 1 sec)
-    if playerList[1].dead and playerList[2].dead then
-      bothDeadTime = bothDeadTime + dt
-      if bothDeadTime > 2 then
-        fullReset();
-        return
-      end
-    end
-
   end
 end
 
