@@ -1,7 +1,12 @@
 
+-- Utility modules
 local class = require "middleclass"
 assert(class, "Unable to load middleclass")
 
+local Gamestate = require "gamestate"
+assert(Gamestate, "Unable to load gamestate")
+
+-- Game modules
 local Player= require "player"
 local Camera = require "camera"
 local Bomb = require "bomb"
@@ -16,19 +21,26 @@ local Jumper = require "jumper"
 local Static = require "static"
 local Grave = require "grave"
 
+local introState = {}
+local inGameState = {}
+local endGameState = {}
+local creditsState = {}
 
-local inIntro=true
-local inEnd=false
-local endFade=0.0
-local creditsTimeout=10.0
+local music = {}
+
+function music:setCurrent(music)
+  if self.current then
+    self.current:pause()
+  end
+  self.current = music
+  self.current:play()
+end
 
 updateList = {}
 drawableList = {}
 onNextReset = {}
 onReset = {}
 cameraList = {}
-
-startArgs = nil
   
 local function insertEntity(entity)
   if entity.update then
@@ -89,22 +101,6 @@ function setupGame()
   puzzlesSolved = 0
 
 end
-
-function fullReset()
-  inIntro=true
-  inEnd=false
-  endFade=0.0
-
-  updateList = {}
-  drawableList = {}
-  onNextReset = {}
-  onReset = {}
-  cameraList = {}
-
-  backgroundMusic:stop()
-  love.load(startArgs)
-end
-
 
 function spawnChicken(x, y)
   local imageList={"p/huun.png", "p/huun_d.png", "p/huun_hpng.png"}
@@ -368,73 +364,6 @@ function spawnStatics()
   end
 end
 
-function love.resize(w, h)
-  cameraList[1]:resize(0, 0, w/2, h)
-  cameraList[2]:resize(w/2, 0, w/2, h)
-end
-
-function love.load(arg)
-  -- Enable debugging
-  if
-    arg[#arg] == "-debug" then require("mobdebug").start()
-  end
-
-  startArgs = arg -- remember args so we can call love.load again on full reset
-  
-  setupGame()
-  
-  local width = love.graphics.getWidth()
-  local height = love.graphics.getHeight()
-  love.resize(width, height)
-  
-  introImageList = {
-    love.graphics.newImage("p/intro_1.png"),
-    love.graphics.newImage("p/intro_2.png"),
-    love.graphics.newImage("p/intro_3.png"),
-    love.graphics.newImage("p/intro_4.png")
-  }
-  
-  notTheEndImage = love.graphics.newImage("p/not_end.png")
-  creditsImage = love.graphics.newImage("p/credits.png")
-  theEndImage = love.graphics.newImage("p/end.png")
-  
-  introTimer = 0.0
-  introFrame = 1
-  
-  local joystickList = love.joystick.getJoysticks()
-  
-  playerList[1]:setJoystick(joystickList[1])
-  playerList[2]:setJoystick(joystickList[2])
-  playerList[1]:setKeys({'w', 'a', 's', 'd', 'q'})
-  playerList[2]:setKeys({'i', 'j', 'k', 'l', 'u'})
-    
-  local cameraDistance = 100
-  cameraList[1]:setFollowTargets(playerList[1], playerList[2], cameraDistance)
-  cameraList[2]:setFollowTargets(playerList[2], playerList[1], cameraDistance)
-  
-  backgroundTexture=love.graphics.newImage("p/sand_grey.jpg")
-    
-  backgroundMusic = love.audio.newSource("s/Main.mp3")
-  backgroundMusic:setLooping(false)
-  
-  introMusic = love.audio.newSource("s/Intro.mp3")
-  --spawnChicken()
-  spawnStatics()
-  
-  resetGame()
-  setupBombPuzzle()
-  setupTwoButtonPuzzle()
-  setupTwoButtonPuzzleAtEdge()
-  setupLongDistancePuzzle()
-  setupLongDistancePuzzleGrave()
-  setupTwoButtonFurtherPuzzle()
-  puzzleCount=6
-  
-  introMusic:setLooping(true)
-  introMusic:play()
-  
-end
-
 function checkEnd(player)
   local maxDistance=120
   local squareDistance=Vector.squareDistance(player.position, jumper.position)
@@ -452,79 +381,180 @@ function checkEnd(player)
     jumper.hide=true
     player:hug()
     bomb.disabled=true
-    player.huggingFinished = function() inEnd=true end
+    player.huggingFinished = function() Gamestate.switch(endGameState) end
   end
 end
 
-function love.update(dt)
-  if inIntro then
-    introTimer = introTimer + dt
-    if introTimer > 0.05 then
-      introTimer = 0
-      introFrame = introFrame + 1
-      if introFrame > #introImageList then
-        introFrame = 1
-      end
-    end
-  elseif inEnd then
-    if endFade < 1.0 then
-      endFade = math.min(endFade + dt, 1.0)
-    else      
-      creditsTimeout = creditsTimeout - dt
-    end    
-  else
-    for j=1,#updateList do
-      updateList[j]:update(dt)
-    end
-    
-    -- check for game end
-    for i=1,#playerList do
-      checkEnd(playerList[i])
+function introState:enter()
+  self.timer = 0.0
+  self.frame = 1
+  introMusic:rewind()
+  music:setCurrent(introMusic)
+end
+
+function introState:update(dt)
+  self.timer = self.timer + dt
+  if self.timer > 0.05 then
+    self.timer = 0
+    self.frame = self.frame + 1
+    if self.frame > #introImageList then
+      self.frame = 1
     end
   end
 end
 
-function love.keypressed( key, isrepeat )
-  if inIntro then
-    inIntro = false
-    introMusic:stop()
-    backgroundMusic:play()
-    alwaysOnReset(function() 
-      backgroundMusic:play()
-    end)
-  end
+function introState:keypressed(key, isrepeat)
+  Gamestate.switch(inGameState)
 end
 
-function love.draw()
+function introState:draw()
+  love.graphics.setScissor()
+  love.graphics.draw(introImageList[self.frame], 0, 0)    
+end
+
+function setupCameraSizes(w, h)
+  cameraList[1]:resize(0, 0, w/2, h)
+  cameraList[2]:resize(w/2, 0, w/2, h)
+end
+
+function love.load(arg)
+  -- Enable debugging
+  if arg[#arg] == "-debug" then
+    require("mobdebug").start()
+  end
   
-  if inIntro then
-    love.graphics.draw(introImageList[introFrame], 0, 0)    
-  else
-    table.sort(drawableList, function(a, b)
-        local layerA = a.drawLayer or 1
-        local layerB = b.drawLayer or 1
-        return layerA < layerB
-    end)
+  setupGame()
+  
+  local width = love.graphics.getWidth()
+  local height = love.graphics.getHeight()
+  setupCameraSizes(width, height)
+  
+  introImageList = {
+    love.graphics.newImage("p/intro_1.png"),
+    love.graphics.newImage("p/intro_2.png"),
+    love.graphics.newImage("p/intro_3.png"),
+    love.graphics.newImage("p/intro_4.png")
+  }
+  
+  notTheEndImage = love.graphics.newImage("p/not_end.png")
+  creditsImage = love.graphics.newImage("p/credits.png")
+  theEndImage = love.graphics.newImage("p/end.png")
     
-    for i=1,#cameraList do
-      cameraList[i]:setScissor()
-      love.graphics.setColor(64, 64, 64)
-      
-      cameraList[i]:draw(backgroundTexture, -2048, -2048)
-      for j=1,#drawableList do
-        drawableList[j]:draw(cameraList[i])
-      end
-    end
-    love.graphics.setScissor()
+  local joystickList = love.joystick.getJoysticks()
+  
+  playerList[1]:setJoystick(joystickList[1])
+  playerList[2]:setJoystick(joystickList[2])
+  playerList[1]:setKeys({'w', 'a', 's', 'd', 'q'})
+  playerList[2]:setKeys({'i', 'j', 'k', 'l', 'u'})
     
-    if inEnd then
-      love.graphics.setColor(255, 255, 255, 255*endFade)
-      if creditsTimeout < 0.0 then        
-        love.graphics.draw(creditsImage, 0, 0)
-      else
-        love.graphics.draw(notTheEndImage, 0, 0)
-      end
+  local cameraDistance = 100
+  cameraList[1]:setFollowTargets(playerList[1], playerList[2], cameraDistance)
+  cameraList[2]:setFollowTargets(playerList[2], playerList[1], cameraDistance)
+  
+  backgroundTexture=love.graphics.newImage("p/sand_grey.jpg")
+    
+  backgroundMusic = love.audio.newSource("s/Main.mp3")
+  backgroundMusic:setLooping(false)
+  
+  introMusic = love.audio.newSource("s/Intro.mp3")
+  introMusic:setLooping(true)
+  
+  creditsMusic = love.audio.newSource("s/End.mp3")
+  creditsMusic:setLooping(true)
+  
+  --spawnChicken()
+  spawnStatics()
+  
+  resetGame()
+  setupBombPuzzle()
+  setupTwoButtonPuzzle()
+  setupTwoButtonPuzzleAtEdge()
+  setupLongDistancePuzzle()
+  setupLongDistancePuzzleGrave()
+  setupTwoButtonFurtherPuzzle()
+  puzzleCount=6
+    
+  alwaysOnReset(function() 
+    backgroundMusic:rewind()
+    music:setCurrent(backgroundMusic)
+  end)
+  Gamestate.registerEvents()
+  Gamestate.switch(introState)
+end
+
+function inGameState:enter()
+  music:setCurrent(backgroundMusic)
+end
+
+
+function inGameState:update(dt)
+  for j=1,#updateList do
+    updateList[j]:update(dt)
+  end
+  
+  -- check for game end
+  for i=1,#playerList do
+    checkEnd(playerList[i])
+  end  
+end
+
+function inGameState:keypressed(key, isrepeat)
+  if key == "escape" then
+    Gamestate.switch(introState)
+  end  
+end
+
+function inGameState:draw()
+  table.sort(drawableList, function(a, b)
+      local layerA = a.drawLayer or 1
+      local layerB = b.drawLayer or 1
+      return layerA < layerB
+  end)
+  
+  for i=1,#cameraList do
+    cameraList[i]:setScissor()
+    love.graphics.setColor(64, 64, 64)
+    
+    cameraList[i]:draw(backgroundTexture, -2048, -2048)
+    for j=1,#drawableList do
+      drawableList[j]:draw(cameraList[i])
     end
+  end
+  love.graphics.setScissor()
+end
+
+function endGameState:enter()
+  self.fade = 0
+end
+
+function endGameState:update(dt)  
+  self.fade = math.min(self.fade + dt*0.1, 1.0)   
+end
+
+function endGameState:draw()
+  inGameState:draw()
+  love.graphics.setScissor()
+  love.graphics.setColor(255, 255, 255, 255*self.fade)
+  love.graphics.draw(notTheEndImage, 0, 0)
+end
+
+function endGameState:keypressed(key, isrepeat)
+  if self.fade > 0.8 then
+    Gamestate.switch(creditsState)
   end
 end
 
+function creditsState:enter()
+  creditsMusic:rewind()
+  music:setCurrent(creditsMusic)
+end
+
+function creditsState:draw()
+  love.graphics.setScissor()
+  love.graphics.draw(creditsImage, 0, 0)
+end
+
+function creditsState:keypressed(key, isrepeat)
+  Gamestate.switch(introState)
+end
+  
