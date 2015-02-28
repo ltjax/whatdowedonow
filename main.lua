@@ -170,7 +170,7 @@ end
 
 function setupBombPuzzle() --6
   local px, py=-900, 900
-  local button=Button:new(-20+px, -260+py, playerList, true, false, "p/schalt_4.png", 2.0)
+  local button=Button:new(-20+px, -260+py, playerList, "p/schalt_4.png", buttonSound[2], {volatile=false, pressTime=2.0})
   insertEntity(button)
   
   local smallBomb=SmallBomb:new(30+px, -230+py, playerList)
@@ -194,10 +194,10 @@ function setupBombPuzzle() --6
 end
 
 function setupTwoButtonPuzzle() --1
-  local button1=Button:new(100, 200, playerList, true, true, "p/schalt_4.png")
+  local button1=Button:new(100, 200, playerList, "p/schalt_4.png", buttonSound[1])
   insertEntity(button1)
 
-  local button2=Button:new(-100, 200, playerList, true, true, "p/schalt_4.png")
+  local button2=Button:new(-100, 200, playerList, "p/schalt_4.png", buttonSound[1])
   insertEntity(button2)
   
   local function stateChanged()
@@ -219,10 +219,10 @@ function setupTwoButtonPuzzle() --1
 end
 
 function setupTwoButtonPuzzleAtEdge() --4
-  local button1=Button:new(900, -1800, playerList, true, true, "p/schalt_4.png")
+  local button1=Button:new(900, -1800, playerList, "p/schalt_4.png", buttonSound[1])
   insertEntity(button1)
 
-  local button2=Button:new(-1500, 1500, playerList, true, true, "p/schalt_4.png")
+  local button2=Button:new(-1500, 1500, playerList, "p/schalt_4.png", buttonSound[1])
   insertEntity(button2)
   
   local function stateChanged()
@@ -243,10 +243,10 @@ function setupTwoButtonPuzzleAtEdge() --4
 end
 
 function setupTwoButtonFurtherPuzzle() --5
-  local button1=Button:new(-1800, -1800, playerList, true, true, "p/schalt_4.png")
+  local button1=Button:new(-1800, -1800, playerList, "p/schalt_4.png", buttonSound[1])
   insertEntity(button1)
 
-  local button2=Button:new(1800, -1800, playerList, true, true, "p/schalt_4.png")
+  local button2=Button:new(1800, -1800, playerList, "p/schalt_4.png", buttonSound[1])
   insertEntity(button2)
   
   local function stateChanged()
@@ -266,7 +266,7 @@ end
 
 function setupLongDistancePuzzle() --2
   
-  local button=Button:new(0, -900, playerList, true, false, "p/schalt_1.png")
+  local button=Button:new(0, -900, playerList, "p/schalt_1.png", buttonSound[2], {volatile=false})
   insertEntity(button)
   
   local door=Door:new(0, 900, playerList)
@@ -292,7 +292,7 @@ end
 
 function setupLongDistancePuzzleGrave() -- not Grave anymore -- 3 -- sry
   
-  local button=Button:new(-1500, -1800, playerList, true, false, "p/schalt_1.png")
+  local button=Button:new(-1500, -1800, playerList, "p/schalt_1.png", buttonSound[2], {volatile=false})
   insertEntity(button)
   
   local door=Door:new(0, 1200, playerList)
@@ -461,6 +461,12 @@ function love.load(arg)
   
   creditsMusic = love.audio.newSource("s/End.mp3")
   creditsMusic:setLooping(true)
+  
+  
+  buttonSound = {
+    "s/Butt.wav",
+    "s/Schalt.mp3"
+  }
   
   --spawnChicken()
   spawnStatics()

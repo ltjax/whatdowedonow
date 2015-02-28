@@ -4,17 +4,24 @@ assert(class, "Unable to load middleclass")
 local Button=class('Button')
 local Vector=require "vector"
 
-function Button:initialize(x, y, playerList, explicitAction, volatile, imageName, pressTime)
+function Button:initialize(x, y, playerList, imageName, sound, options)
+  assert(x and y and playerList and imageName, "Incorrect number of parameters")
+  
   self.activated=false
   self.position={x=x, y=y}
   self.playerList=playerList
   self.locked=false
-  self.explicitAction=explicitAction
-  self.volatile=volatile
+  if options and options.volatile ~= nil then
+    self.volatile = options.volatile
+  else
+    self.volatile = true
+  end
   self.image=love.graphics.newImage(imageName)
-  self.totalPressTime=pressTime or 0
+  self.totalPressTime=options and options.pressTime or 0
   self.currentPressTime=0
   self.hidden=false
+  self.sound=love.audio.newSource(sound)
+  self.sound:setLooping(false)
 end
 
 function Button:hide()
@@ -62,7 +69,7 @@ function Button:update(dt)
       local player=playerList[i]
       local maxDistance=50
       local squareDistance=Vector.squareDistance(player.position, self.position)
-      if squareDistance < maxDistance*maxDistance and (player.action or not self.explicitAction) then
+      if squareDistance < maxDistance*maxDistance and player.action then
         buttonPressed=true
       end
     end
@@ -82,6 +89,9 @@ function Button:update(dt)
   -- Has anything changed? notify event handlers
   if self.stateChanged and self.activated ~= previousState then
     self.stateChanged(self.activated)
+    if self.activated then
+      self.sound:play()
+    end
   end
 end
 
