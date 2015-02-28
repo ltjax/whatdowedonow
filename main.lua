@@ -368,14 +368,20 @@ function checkEnd(player)
   local maxDistance=120
   local squareDistance=Vector.squareDistance(player.position, jumper.position)
   
-  if puzzlesSolved < puzzleCount then
-    return
-  end
+--  if puzzlesSolved < puzzleCount then
+--    return
+--  end
   
   if squareDistance > maxDistance*maxDistance then
     return
   end
   
+  -- Don't end if the jumper is already jumping
+  if not jumper.animation.stopped then
+    return
+  end
+  
+  -- Start the finish hug
   player.autoTarget = {x=jumper.position.x+player.hugOffset, y=jumper.position.y}
   player.autoTargetFinished = function()
     jumper.hide=true
@@ -436,9 +442,7 @@ function love.load(arg)
     love.graphics.newImage("p/intro_4.png")
   }
   
-  notTheEndImage = love.graphics.newImage("p/not_end.png")
-  creditsImage = love.graphics.newImage("p/credits.png")
-  theEndImage = love.graphics.newImage("p/end.png")
+  notTheEndImage = love.graphics.newImage("p/not_end_cred.png")
     
   local joystickList = love.joystick.getJoysticks()
   
@@ -534,7 +538,10 @@ function endGameState:enter()
 end
 
 function endGameState:update(dt)  
-  self.fade = math.min(self.fade + dt*0.1, 1.0)   
+  self.fade = math.min(self.fade + dt*0.13, 1.0)  
+  if self.fade >= 1.0 then
+    Gamestate.switch(creditsState)
+  end
 end
 
 function endGameState:draw()
@@ -544,23 +551,25 @@ function endGameState:draw()
   love.graphics.draw(notTheEndImage, 0, 0)
 end
 
-function endGameState:keypressed(key, isrepeat)
-  if self.fade > 0.8 then
-    Gamestate.switch(creditsState)
-  end
-end
-
 function creditsState:enter()
   creditsMusic:rewind()
   music:setCurrent(creditsMusic)
+  self.slide=0
+  self.maxSlide=notTheEndImage:getHeight() - love.graphics.getHeight()
+end
+
+function creditsState:update(dt)
+  self.slide=math.min(self.maxSlide, self.slide + dt*60)
 end
 
 function creditsState:draw()
   love.graphics.setScissor()
-  love.graphics.draw(creditsImage, 0, 0)
+  love.graphics.draw(notTheEndImage, 0, -self.slide)
 end
 
 function creditsState:keypressed(key, isrepeat)
-  Gamestate.switch(introState)
+  if self.slide >= self.maxSlide then
+    Gamestate.switch(introState)
+  end
 end
   
