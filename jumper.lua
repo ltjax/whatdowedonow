@@ -19,7 +19,11 @@ function Jumper:reset()
   self.move=0
 end
 
-function Jumper:draw(camera)
+function Jumper:getDepth()
+  return self.animation:getDepth(self.position.y)
+end
+
+function Jumper:drawSprite(camera)
   if self.hide then
     return
   end

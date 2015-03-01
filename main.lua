@@ -38,16 +38,32 @@ end
 
 updateList = {}
 drawableList = {}
+spriteList = {}
 onNextReset = {}
 onReset = {}
 cameraList = {}
   
 local function insertEntity(entity)
+  -- Insert items that need update pulsing
   if entity.update then
     table.insert(updateList, entity)
   end
-  if entity.draw then
-    table.insert(drawableList, entity) 
+  -- Insert generic drawable items
+  if entity.draw or entity.drawLayer then
+    assert(entity.draw and entity.drawLayer, "Sprite-like entities need both draw and drawLayer")
+    table.insert(drawableList, entity)
+  
+    -- Update layers, if needed
+    table.sort(drawableList, function(a, b)
+        local layerA = a.drawLayer or 1
+        local layerB = b.drawLayer or 1
+        return layerA < layerB
+    end) 
+  end
+  -- Insert sprite-like items into the sprite list
+  if entity.drawSprite or entity.getDepth then
+    assert(entity.drawSprite and entity.getDepth, "Sprite-like entities need both drawSprite and getDepth")
+    table.insert(spriteList, entity)
   end
 end
 
@@ -501,6 +517,9 @@ function inGameState:update(dt)
   for j=1,#updateList do
     updateList[j]:update(dt)
   end
+
+  -- Update sprite depth
+  table.sort(spriteList, function(a, b) return a:getDepth() < b:getDepth() end)
   
   -- check for game end
   for i=1,#playerList do
@@ -515,17 +534,20 @@ function inGameState:keypressed(key, isrepeat)
 end
 
 function inGameState:draw()
-  table.sort(drawableList, function(a, b)
-      local layerA = a.drawLayer or 1
-      local layerB = b.drawLayer or 1
-      return layerA < layerB
-  end)
   
   for i=1,#cameraList do
     cameraList[i]:setScissor()
     love.graphics.setColor(64, 64, 64)
     
+    -- Draw background
     cameraList[i]:draw(backgroundTexture, -2048, -2048)
+    
+    -- Draw sprites
+    for j=1,#spriteList do
+      spriteList[j]:drawSprite(cameraList[i])
+    end
+  
+    -- Draw other stuff
     for j=1,#drawableList do
       drawableList[j]:draw(cameraList[i])
     end

@@ -22,6 +22,7 @@ function Button:initialize(x, y, playerList, imageName, sound, options)
   self.hidden=false
   self.sound=love.audio.newSource(sound)
   self.sound:setLooping(false)
+  self.drawLayer=4
 end
 
 function Button:hide()
@@ -32,10 +33,16 @@ function Button:show()
   self.hidden=false
 end
 
-function Button:draw(camera)
+function Button:getDepth()
+  return self.position.y - 32 -- Sic! want to force this "under" all other things
+end
+
+function Button:drawSprite(camera)
   if self.hidden then
     return
   end
+  
+  local cx, cy=camera:offsets()
   
   local quad
   local tileSize=64
@@ -44,11 +51,18 @@ function Button:draw(camera)
   else
     quad = love.graphics.newQuad(0, 0, 64, 64, self.image:getDimensions())
   end
-  local cx, cy=camera:offsets()
   
   love.graphics.setColor(120, 120, 120, 255)
   love.graphics.draw(self.image, quad, self.position.x+cx-32, self.position.y+cy-32)
+end
+
+function Button:draw(camera)
+  if self.hidden then
+    return
+  end
   
+  local cx, cy=camera:offsets()
+    
   if self.totalPressTime>0 and self.currentPressTime>0 and not self.activated then
     love.graphics.rectangle("line", self.position.x+cx-32, self.position.y+cy+32+8, 64, 8)
     love.graphics.rectangle("fill", self.position.x+cx-32, self.position.y+cy+32+8, 64*self.currentPressTime/self.totalPressTime, 8)

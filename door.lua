@@ -12,8 +12,11 @@ function Door:initialize(x, y, playerList)
   self.quad=love.graphics.newQuad(0, 0, 64, 64, self.image:getDimensions())
 end
 
+function Door:getDepth()
+  return self.position.y + 32
+end
 
-function Door:draw(camera)
+function Door:drawSprite(camera)
   local cx, cy=camera:offsets()
   
   love.graphics.setColor(72, 28, 10, 255)

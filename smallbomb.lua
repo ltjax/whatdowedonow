@@ -14,6 +14,7 @@ function SmallBomb:initialize(x, y, playerList)
   self.triggered=false
   self.explosionTime = -1
   self.explosionRadius = 200
+  self.drawLayer = 4
 end
 
 function SmallBomb:reset()
@@ -25,14 +26,23 @@ end
 
 function SmallBomb:draw(camera)
   local cx, cy = camera:offsets()
-  if self.explosionTime < 0 then
-    love.graphics.setColor(255,255,255,255)
-    self.animation:draw(self.position.x+cx, self.position.y+cy)
-  elseif self.explosionTime <= 1 then
+  if self.explosionTime <= 1 then
     local minRadius=30
     local radius=minRadius+self.explosionTime*(self.explosionRadius-minRadius)
     love.graphics.setColor(255,50,50,255)
     love.graphics.circle("fill", self.position.x+cx, self.position.y+cy, radius, 100)
+  end
+end
+
+function SmallBomb:getDepth()
+  return self.animation:getDepth(self.position.y)
+end
+
+function SmallBomb:drawSprite(camera)
+  local cx, cy = camera:offsets()
+  if self.explosionTime < 0 then
+    love.graphics.setColor(255,255,255,255)
+    self.animation:draw(self.position.x+cx, self.position.y+cy)
   end
 end
 

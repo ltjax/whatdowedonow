@@ -9,7 +9,11 @@ function Static:initialize(x, y, image)
   self.image = image
 end
 
-function Static:draw(camera)
+function Static:getDepth()
+  return self.position.y + self.image:getHeight()
+end
+
+function Static:drawSprite(camera)
   local cx, cy=camera:offsets()
   love.graphics.setColor(30,160,160,255)
   love.graphics.draw(self.image, self.position.x+cx, self.position.y+cy)

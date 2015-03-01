@@ -25,6 +25,10 @@ function Walker:initialize(image, tileSizeX, tileSizeY)
   self.offset = {x=-self.tileSizeX/2, y=-self.tileSizeY/2}
 end
 
+function Walker:getDepth(y)
+  return y-self.offset.y
+end
+
 function Walker:reset()
   self.direction = 1
   self.animState=1

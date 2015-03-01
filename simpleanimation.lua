@@ -49,6 +49,10 @@ function SimpleAnimation:update(dt)
   end
 end
 
+function SimpleAnimation:getDepth(y)
+  return y+self.tileSizeY/2
+end
+
 function SimpleAnimation:draw(x, y)
   love.graphics.draw(self.image, self.frameList[self.currentFrame], x-self.tileSizeX/2, y-self.tileSizeY/2)
 end

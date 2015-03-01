@@ -11,7 +11,6 @@ function Player:initialize(image, dyingImage, hugImage, hugOffset)
   self.speed = 160.0
   self.position = {x=0, y=0}
   self.walker = Walker:new(image)
-  self.drawLayer = 2
   self.dead=false
   self.dyingAnimation = SimpleAnimation:new(dyingImage, 4, 0.06)
   self.hugAnimation = SimpleAnimation:new(hugImage, 24, 0.1)
@@ -123,7 +122,19 @@ function Player:update(deltaTime)
   end
 end
 
-function Player:draw(camera)
+function Player:getDepth()
+  if not self.hugging then   
+    if not self.dead then
+      return self.walker:getDepth(self.position.y)
+    else
+      return self.dyingAnimation:getDepth(self.position.y)
+    end
+  else
+    return self.hugAnimation:getDepth(self.position.y)
+  end
+end
+
+function Player:drawSprite(camera)
   
   love.graphics.setColor(180, 180, 180, 255);
   --camera:draw(self.image, self.position.x+self.offset.x, self.position.y+self.offset.y)

@@ -24,9 +24,18 @@ function Bomb:reset()
   resetGame()
 end
 
+function Bomb:getDepth()
+  return self.position.y + self.image:getHeight()/2
+end
+
+function Bomb:drawSprite(camera)
+  local ox, oy=camera:offsets()
+  love.graphics.setColor(255, 255, 255, 255)
+  love.graphics.draw(self.image, self.position.x + ox - self.image:getWidth()/2, self.position.y + oy - self.image:getHeight()/2)
+end
+
 function Bomb:draw(camera)
   local ox, oy=camera:offsets()
-  love.graphics.draw(self.image, self.position.x + ox - self.image:getWidth()/2, self.position.y + oy - self.image:getHeight()/2)
   
   love.graphics.setBlendMode("additive") --Default blend mode
   love.graphics.setColor(50, 50, 50, 80)

@@ -8,9 +8,12 @@ function Animal:initialize(image, speed, distance)
   self.walker = Walker:new(image)
   self.position = {x=0, y=0}
   self.waitTime = 0.0
-  self.drawLayer = 2
   self.speed = speed
   self.distance = distance
+end
+
+function Animal:getDepth()
+  return self.walker:getDepth(self.position.y)
 end
 
 function Animal:setPosition(x, y)
@@ -44,7 +47,7 @@ function Animal:update(dt)
   end
 end
   
-function Animal:draw(camera)
+function Animal:drawSprite(camera)
   local cx,cy=camera:offsets()
   love.graphics.setColor(200, 200, 200, 255)
   self.walker:draw(self.position.x+cx, self.position.y+cy)

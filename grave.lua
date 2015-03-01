@@ -7,14 +7,14 @@ function Grave:initialize(x, y)
   self.position = {x=x, y=y}
   self.image = love.graphics.newImage("p/grab.png")
   self.imageCandle = love.graphics.newImage("p/grab_kerze.png")
-  self.drawLayer = 3
   self.hasCandle = false
 end
 
-function Grave:update(dt)
+function Grave:getDepth()
+  return self.position.y + self.image:getHeight()/2
 end
 
-function Grave:draw(camera)
+function Grave:drawSprite(camera)
   local cx, cy = camera:offsets()
   local x = self.position.x+cx
   local y = self.position.y+cy
