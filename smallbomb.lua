@@ -26,7 +26,7 @@ end
 
 function SmallBomb:draw(camera)
   local cx, cy = camera:offsets()
-  if self.explosionTime <= 1 then
+  if self.explosionTime > 0 and self.explosionTime <= 1 then
     local minRadius=30
     local radius=minRadius+self.explosionTime*(self.explosionRadius-minRadius)
     love.graphics.setColor(255,50,50,255)

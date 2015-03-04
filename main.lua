@@ -185,19 +185,31 @@ end
 
 function setupBombPuzzle() --6
   local px, py=-900, 900
-  local button=Button:new(-20+px, -260+py, playerList, "p/schalt_4.png", buttonSound[2], {volatile=false, pressTime=2.0})
+  local button=Button:new(px, py+32, playerList, "p/schalt_4.png", buttonSound[2], {volatile=false})
   insertEntity(button)
   
-  local smallBomb=SmallBomb:new(30+px, -230+py, playerList)
+  local smallBomb=SmallBomb:new(px+250, py+32, playerList)
   insertEntity(smallBomb)
+  
+  local stoneCircle=Static:new(px, py, love.graphics.newImage("p/steinkreis.png"))
+  stoneCircle.depthOffset = stoneCircle.depthOffset / 2
+  insertEntity(stoneCircle)
+  
+  playerList[1].ellipseCollider={x=px,y=py+32,rx=140,ry=80}
+  playerList[2].ellipseCollider={x=px,y=py+32,rx=140,ry=80}
+  
   smallBomb.onExplode = function()
-    if smallBomb:inExplosionRange(button.position) then
-      button:hide()
+    if smallBomb:inExplosionRange(stoneCircle.position) then
+      stoneCircle.image = love.graphics.newImage("p/steinkreis_a.png")
+      playerList[1].ellipseCollider=nil
+      playerList[2].ellipseCollider=nil
     end
   end
   
   alwaysOnReset(function()
-    button:show()
+    stoneCircle.image = love.graphics.newImage("p/steinkreis.png")
+    playerList[1].ellipseCollider={x=px,y=py+32,rx=140,ry=80}
+    playerList[2].ellipseCollider={x=px,y=py+32,rx=140,ry=80}
     smallBomb:reset()
   end)
   

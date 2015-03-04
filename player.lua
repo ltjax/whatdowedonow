@@ -63,13 +63,35 @@ function Player:updateInput()
     if love.keyboard.isDown(self.keys[5]) then
       self.action=true
     end
-    
-    local mapBorder=1990
-    self.position.x=math.max(-mapBorder, math.min(mapBorder, self.position.x))
-    self.position.y=math.max(-mapBorder, math.min(mapBorder, self.position.y))
+    self:resolveCollision()
   end
   
   return dx, dy
+end
+
+function Player:resolveCollision()
+  
+  local mapBorder=1990
+  self.position.x=math.max(-mapBorder, math.min(mapBorder, self.position.x))
+  self.position.y=math.max(-mapBorder, math.min(mapBorder, self.position.y))
+  
+  if self.ellipseCollider then
+    local x, y, rx, ry = self.ellipseCollider.x, self.ellipseCollider.y,
+      self.ellipseCollider.rx, self.ellipseCollider.ry
+    
+    local skew=ry/rx
+    local dx=(self.position.x-x)
+    local dy=(self.position.y-y)/skew
+    
+    local distance=Vector.length({x=dx, y=dy})
+    if distance > 0 and distance < rx then
+      dx = dx*rx/distance
+      dy = dy*rx/distance
+      dy = dy*skew
+      self.position.x = x+dx
+      self.position.y = y+dy
+    end
+  end
 end
 
 function Player:update(deltaTime)
