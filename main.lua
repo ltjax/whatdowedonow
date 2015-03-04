@@ -12,7 +12,6 @@ local Camera = require "camera"
 local Bomb = require "bomb"
 local Glowworm = require "glowworm"
 local Button = require "button"
-local Door = require "door"
 local Animal = require "animal"
 local SmallBomb = require "smallbomb"
 local Lamp = require "lamp"
@@ -285,20 +284,20 @@ function setupLongDistancePuzzle() --2
   local button=Button:new(0, -900, playerList, "p/schalt_1.png", buttonSound[2], {volatile=false})
   insertEntity(button)
   
-  local door=Door:new(0, 900, playerList)
-  insertEntity(door)
-  door.locked=true
+  local deactivatedButton=Button:new(0, 900, playerList, "p/schalt_4.png", buttonSound[1], {volatile=false})
+  insertEntity(deactivatedButton)
+  deactivatedButton.locked=true
   
   button.stateChanged = function()
-    door.locked=false
+    deactivatedButton.locked=false
   end
   
   alwaysOnReset(function()
     button.activated=false
-    door.locked=true
+    deactivatedButton.locked=true
   end)
   
-  door.stateChanged = function()
+  deactivatedButton.stateChanged = function()
     table.insert(onNextReset, function()
       rewardSpawnDog()
     end)
@@ -311,20 +310,20 @@ function setupLongDistancePuzzleGrave() -- not Grave anymore -- 3 -- sry
   local button=Button:new(-1500, -1800, playerList, "p/schalt_1.png", buttonSound[2], {volatile=false})
   insertEntity(button)
   
-  local door=Door:new(0, 1200, playerList)
-  insertEntity(door)
-  door.locked=true
+  local deactivatedButton=Button:new(0, 1200, playerList, "p/schalt_4.png", buttonSound[1], {volatile=false})
+  insertEntity(deactivatedButton)
+  deactivatedButton.locked=true
   
   button.stateChanged = function()
-    door.locked=false
+    deactivatedButton.locked=false
   end
   
   alwaysOnReset(function()
     button.activated=false
-    door.locked=true
+    deactivatedButton.locked=true
   end)
   
-  door.stateChanged = function()
+  deactivatedButton.stateChanged = function()
     table.insert(onNextReset, function()
       
       rewardTurnOnLamps()

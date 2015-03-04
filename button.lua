@@ -23,6 +23,15 @@ function Button:initialize(x, y, playerList, imageName, sound, options)
   self.sound=love.audio.newSource(sound)
   self.sound:setLooping(false)
   self.drawLayer=4
+  
+  if self.image:getWidth() == 128 then
+    self.normalOffset=0
+    self.activatedOffset=64
+  else
+    self.normalOffset=64
+    self.activatedOffset=128
+  end
+  
 end
 
 function Button:hide()
@@ -46,13 +55,15 @@ function Button:drawSprite(camera)
   
   local quad
   local tileSize=64
-  if self.activated then
-    quad = love.graphics.newQuad(64, 0, 64, 64, self.image:getDimensions())
+  if self.locked then
+    quad = love.graphics.newQuad(0, 0, tileSize, tileSize, self.image:getDimensions())
+  elseif self.activated then
+    quad = love.graphics.newQuad(self.activatedOffset, 0, tileSize, tileSize, self.image:getDimensions())
   else
-    quad = love.graphics.newQuad(0, 0, 64, 64, self.image:getDimensions())
+    quad = love.graphics.newQuad(self.normalOffset, 0, tileSize, tileSize, self.image:getDimensions())
   end
   
-  love.graphics.setColor(120, 120, 120, 255)
+  love.graphics.setColor(180, 180, 180, 255)
   love.graphics.draw(self.image, quad, self.position.x+cx-32, self.position.y+cy-32)
 end
 
