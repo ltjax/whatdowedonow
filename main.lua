@@ -39,6 +39,7 @@ end
 updateList = {}
 drawableList = {}
 spriteList = {}
+objectList = {}
 onNextReset = {}
 onReset = {}
 cameraList = {}
@@ -65,6 +66,9 @@ local function insertEntity(entity)
     assert(entity.drawSprite and entity.getDepth, "Sprite-like entities need both drawSprite and getDepth")
     table.insert(spriteList, entity)
   end
+  
+  -- Insert all objects in the generic object list, in case we need to search
+  table.insert(objectList, entity)
 end
 
 local function alwaysOnReset(f)
@@ -176,19 +180,19 @@ function rewardSpawnGlowWorms()
 end
 
 function rewardTurnOnLamps()
-  for j=1,#updateList do
+  for j=1,#objectList do
     -- find all lamps and turn them on
-    if updateList[j]:isInstanceOf(Lamp) then
-      updateList[j].turnedOn = true
+    if objectList[j]:isInstanceOf(Lamp) then
+      objectList[j].turnedOn = true
     end
   end
 end
 
 function rewardAddCandleToGrave()
-  for j=1,#updateList do
+  for j=1,#objectList do
     -- find the grave
-    if updateList[j]:isInstanceOf(Grave) then
-      updateList[j].hasCandle = true
+    if objectList[j]:isInstanceOf(Grave) then
+      objectList[j].hasCandle = true
     end
   end
 end
