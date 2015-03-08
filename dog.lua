@@ -6,6 +6,7 @@ local Dog = class("Dog")
 
 function Dog:initialize(players, targets)
   self.walker = Walker:new("p/bestdog.png", 50, 32)
+  self.barkSound = love.audio.newSource("s/bark.mp3", "static")
   self.walker.frameTime = 0.1
 
   self.sitImage = love.graphics.newImage("p/dog_sit_l.png")
@@ -60,6 +61,12 @@ function Dog:update(dt)
   local maxSpeed = self.speed*dt
     
   if distance < maxSpeed then
+
+    -- wasn't waiting but is now? bark!
+    if not self.waiting and self.currentTargetIndex > 1 then
+      self.barkSound:play()
+    end
+
     maxSpeed = distance
     self.waiting = true
     self.waitingSince = self.waitingSince + dt
