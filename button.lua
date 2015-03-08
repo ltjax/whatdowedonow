@@ -55,7 +55,7 @@ function Button:drawSprite(camera)
   
   local quad
   local tileSize=64
-  if self.locked then
+  if self.locked and not self.activated then
     quad = love.graphics.newQuad(0, 0, tileSize, tileSize, self.image:getDimensions())
   elseif self.activated then
     quad = love.graphics.newQuad(self.activatedOffset, 0, tileSize, tileSize, self.image:getDimensions())
