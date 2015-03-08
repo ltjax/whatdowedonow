@@ -10,6 +10,7 @@ function Walker:initialize(image, tileSizeX, tileSizeY)
   self.anim={}
   self.animState=1
   self.animTransition=0.0
+  self.frameTime = 0.15
   
   self.tileSizeX=tileSizeX or self.image:getWidth() / 16
   self.tileSizeY=tileSizeY or self.image:getHeight()
@@ -62,7 +63,7 @@ function Walker:updateWalk(dx, dy, deltaTime)
   
   -- Change between animstates as long as we are moving
   self.animTransition = self.animTransition + deltaTime
-  if self.animTransition > 0.15 then
+  if self.animTransition > self.frameTime then
     self.animTransition = 0.0
     self.animState = self.animState + 1
     if self.animState > 4 then

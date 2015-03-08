@@ -13,6 +13,7 @@ local Bomb = require "bomb"
 local Glowworm = require "glowworm"
 local Button = require "button"
 local Animal = require "animal"
+local Dog = require "dog"
 local SmallBomb = require "smallbomb"
 local Lamp = require "lamp"
 local Vector = require "vector"
@@ -112,6 +113,15 @@ function setupGame()
   jumper=Jumper:new(love.math.random(-300, 300), 2000)
   insertEntity(jumper)
   alwaysOnReset(function() jumper:reset() end)
+
+  dogRoute = {
+    {x=0, y=250},
+    {x=-100, y=500},
+    {x=150, y=900},
+    {x=250, y=1400},
+    {x=0, y=1500},
+    {x=jumper.position.x + 60, y=jumper.position.y-20}
+  }
   
   puzzlesSolved = 0
 
@@ -147,10 +157,10 @@ function rewardSpawnPlants()
 end
 
 function rewardSpawnDog()
-  local dog=Animal:new("p/bestdog.png", 60, 100)
+  local dog=Dog:new(playerList, dogRoute)
   insertEntity(dog)
-  dog:setPosition(200, 200) 
-  alwaysOnReset(function() dog:setPosition(200, 200) end)
+
+  alwaysOnReset(function() dog:reset() end)
 end
 
 function rewardSpawnGlowWorms()
@@ -232,10 +242,9 @@ function setupTwoButtonPuzzle() --1
       button1.locked=true
       button2.locked=true
 
-      rewardAddCandleToGrave()
-
       table.insert(onNextReset, function()
-      end) 
+        rewardSpawnDog()
+      end)      
         
       puzzlesSolved = puzzlesSolved + 1
     end
@@ -311,7 +320,7 @@ function setupLongDistancePuzzle() --2
   
   deactivatedButton.stateChanged = function()
     table.insert(onNextReset, function()
-      rewardSpawnDog()
+      rewardAddCandleToGrave()
     end)
     puzzlesSolved = puzzlesSolved + 1
   end
@@ -395,9 +404,9 @@ function checkEnd(player)
   local maxDistance=120
   local squareDistance=Vector.squareDistance(player.position, jumper.position)
   
---  if puzzlesSolved < puzzleCount then
---    return
---  end
+  if puzzlesSolved < puzzleCount then
+    return
+  end
   
   if squareDistance > maxDistance*maxDistance then
     return
