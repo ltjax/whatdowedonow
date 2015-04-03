@@ -5,7 +5,7 @@ assert(class, "Unable to load middleclass")
 
 local Bomb=class("Bomb")
 
-function Bomb:initialize()
+function Bomb:initialize(onReset)
   self.maxTime = 20
   self.time = self.maxTime
   self.position = {x=0, y=0}
@@ -17,11 +17,12 @@ function Bomb:initialize()
   self.explosionSound:setVolume(0.3)
   self.image=love.graphics.newImage("p/bomb_big_bigger.png")
   self.haloImage=love.graphics.newImage("p/glowworm.png")
+  self.onReset=onReset
 end
 
 function Bomb:reset()
   self.time = self.maxTime
-  resetGame()
+  self.onReset()
 end
 
 function Bomb:getDepth()

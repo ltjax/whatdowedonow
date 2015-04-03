@@ -91,7 +91,7 @@ function Button:update(dt)
     local buttonPressed=false
     
     for i=1,#self.playerList do
-      local player=playerList[i]
+      local player=self.playerList[i]
       local maxDistance=50
       local squareDistance=Vector.squareDistance(player.position, self.position)
       if squareDistance < maxDistance*maxDistance and player.action then
